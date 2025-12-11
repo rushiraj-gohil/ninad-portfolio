@@ -1,6 +1,8 @@
 import streamlit as st
 import os
-from pathlib import Path
+import json
+import requests
+from streamlit_lottie import st_lottie
 
 # Page configuration
 st.set_page_config(
@@ -10,7 +12,19 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS for robotics theme
+# Function to load Lottie animations from URL
+def load_lottieurl(url: str):
+    r = requests.get(url)
+    if r.status_code != 200:
+        return None
+    return r.json()
+
+# Load robotics-themed Lottie animations
+lottie_robot = load_lottieurl("https://assets9.lottiefiles.com/packages/lf20_ghcyb6un.json")
+lottie_arm = load_lottieurl("https://assets9.lottiefiles.com/packages/lf20_tjfwrzyx.json")
+lottie_loading = load_lottieurl("https://assets9.lottiefiles.com/packages/lf20_yx2nzwag.json")
+
+# Custom CSS for robotics theme with enhanced animations
 st.markdown("""
 <style>
     :root {
@@ -84,6 +98,27 @@ st.markdown("""
         margin: 0.3rem;
         font-weight: 600;
         box-shadow: 0 2px 10px rgba(0, 212, 255, 0.3);
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { box-shadow: 0 2px 10px rgba(0, 212, 255, 0.3); }
+        50% { box-shadow: 0 2px 20px rgba(0, 212, 255, 0.6); }
+    }
+    
+    .video-container {
+        background: linear-gradient(135deg, rgba(0, 212, 255, 0.05), rgba(255, 107, 53, 0.05));
+        border: 2px solid var(--accent-1);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+        box-shadow: 0 0 30px rgba(0, 212, 255, 0.2);
+    }
+    
+    .video-container video {
+        border-radius: 8px;
+        width: 100%;
+        box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
     }
     
     h1, h2, h3 {
@@ -98,6 +133,7 @@ st.markdown("""
         -webkit-text-fill-color: transparent;
         background-clip: text;
         margin-bottom: 1rem;
+        animation: fadeInDown 0.8s ease-out;
     }
     
     h2 {
@@ -151,6 +187,29 @@ st.markdown("""
         border-radius: 8px;
         padding: 1.5rem;
         text-align: center;
+        animation: slideUp 0.6s ease-out;
+    }
+    
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
     
     .stat-box-number {
@@ -177,6 +236,16 @@ st.markdown("""
     [data-testid="stButton"] > button:hover {
         transform: translateY(-2px) !important;
         box-shadow: 0 4px 20px rgba(0, 212, 255, 0.4) !important;
+    }
+    
+    .animation-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 2rem;
+        background: linear-gradient(135deg, rgba(0, 212, 255, 0.05), rgba(255, 107, 53, 0.05));
+        border-radius: 12px;
+        margin: 1.5rem 0;
     }
     
 </style>
@@ -227,6 +296,28 @@ if page == "Home":
     
     st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
     
+    # Robot Animation Section
+    st.markdown("### 🤖 Featured Animation")
+    col_anim1, col_anim2 = st.columns([1, 1], gap="large")
+    
+    with col_anim1:
+        if lottie_robot:
+            st_lottie(lottie_robot, height=300, key="robot_hero")
+    
+    with col_anim2:
+        st.markdown("""
+        #### Robotics & AI Integration
+        
+        Building the next generation of collaborative robots that understand and adapt to human needs through:
+        
+        - 🧠 **AI-Powered Decision Making**
+        - 👁️ **Computer Vision Systems**
+        - 🤝 **Human-Robot Interaction**
+        - ⚙️ **Real-time Control Systems**
+        """)
+    
+    st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
+    
     # Quick Stats
     st.markdown("### 📊 Quick Stats")
     col1, col2, col3, col4 = st.columns(4)
@@ -273,22 +364,31 @@ elif page == "Projects":
     
     st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
     
-    # Project 1
-    st.markdown("""
-    <div class="project-card">
-        <h3>🤝 Trust Building in Human-AI Interaction</h3>
-        <p><strong>Timeline:</strong> Dec 2024 – Present</p>
-        <p>Leading development of a human-companion robot for trust building through adaptive responses.</p>
-        <ul>
-            <li>Platform: Jackal Robot (Clearpath Robotics)</li>
-            <li>Tech Stack: ROS, Python, Adaptive Learning, Emotion Recognition</li>
-            <li>Focus: Face & Voice emotion recognition, Real-time robot response system</li>
-            <li>Goal: Build adaptive learning feedback mechanisms for better human-robot trust</li>
-        </ul>
-    </div>
-    """, unsafe_allow_html=True)
+    # Project 1 with Animation
+    col_proj1, col_proj2 = st.columns([2, 1], gap="large")
     
-    # Project 2
+    with col_proj1:
+        st.markdown("""
+        <div class="project-card">
+            <h3>🤝 Trust Building in Human-AI Interaction</h3>
+            <p><strong>Timeline:</strong> Dec 2024 – Present</p>
+            <p>Leading development of a human-companion robot for trust building through adaptive responses.</p>
+            <ul>
+                <li>Platform: Jackal Robot (Clearpath Robotics)</li>
+                <li>Tech Stack: ROS, Python, Adaptive Learning, Emotion Recognition</li>
+                <li>Focus: Face & Voice emotion recognition, Real-time robot response system</li>
+                <li>Goal: Build adaptive learning feedback mechanisms for better human-robot trust</li>
+            </ul>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col_proj2:
+        if lottie_robot:
+            st_lottie(lottie_robot, height=250, key="trust_proj")
+    
+    st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
+    
+    # Project 2 with Video
     st.markdown("""
     <div class="project-card">
         <h3>🍞 Autonomous Toasting with Computer Vision</h3>
@@ -303,6 +403,23 @@ elif page == "Projects":
     </div>
     """, unsafe_allow_html=True)
     
+    # Video Player Section
+    st.markdown("### 📹 Robotic Arm Demonstration")
+    try:
+        video_file = open('video.mp4', 'rb')
+        video_bytes = video_file.read()
+        st.markdown("""
+        <div class="video-container">
+        """, unsafe_allow_html=True)
+        st.video(video_bytes)
+        st.markdown("""
+        </div>
+        """, unsafe_allow_html=True)
+        st.success("✅ Video loaded successfully! Watch the robotic arm in action.")
+    except FileNotFoundError:
+        st.warning("⚠️ Video file not found. Please upload video.mp4 to the repository root.")
+        st.info("📁 To add your video:\n1. Upload 'video.mp4' to your GitHub repo root\n2. Commit and push\n3. Refresh the page")
+    
     st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
     
     st.markdown("### 💡 Technologies Used Across Projects")
@@ -315,6 +432,12 @@ elif page == "Projects":
 # SKILLS & TECH PAGE
 elif page == "Skills & Tech":
     st.markdown("# 🛠️ Skills & Technologies")
+    
+    # Animation at top
+    col_anim, col_empty = st.columns([1, 1])
+    with col_anim:
+        if lottie_arm:
+            st_lottie(lottie_arm, height=300, key="arm_skills")
     
     col1, col2 = st.columns(2, gap="large")
     
